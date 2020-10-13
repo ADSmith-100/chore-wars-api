@@ -3,14 +3,36 @@ const ChildService = require("./child-service");
 const { requireAuth } = require("../middleware/jwt-auth");
 
 const childRouter = express.Router();
+const jsonBodyParser = express.json();
 
-childRouter.route("/").get((req, res, next) => {
-  ChildService.getAllChildren(req.app.get("db"))
-    .then((children) => {
-      res.json(children.map(ChildService.serializeChild));
-    })
-    .catch(next);
-});
+childRouter
+  .route("/")
+  .get((req, res, next) => {
+    ChildService.getAllChildren(req.app.get("db"))
+      .then((children) => {
+        res.json(children.map(ChildService.serializeChild));
+      })
+      .catch(next);
+  })
+  .post(jsonBodyParser, (req, res, next) => {
+    const { name, user_id } = req.body;
+    const newChild = { name, user_id };
+
+    for (const [key, value] of Object.entries(newChild))
+      if (value == null)
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` },
+        });
+
+    ChildService.insertChild(req.app.get("db"), newChild)
+      .then((child) => {
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${child.id}`))
+          .json(serializeChild(child));
+      })
+      .catch(next);
+  });
 
 childRouter
   .route("/:child_id")

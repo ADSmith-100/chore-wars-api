@@ -1,9 +1,11 @@
 const knex = require("knex");
+const supertest = require("supertest");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
 
 describe("Children Endpoints", function () {
   let db;
+  let authToken;
 
   const {
     testUsers,
@@ -22,6 +24,20 @@ describe("Children Endpoints", function () {
   after("disconnect from db", () => db.destroy());
 
   before("cleanup", () => helpers.cleanTables(db));
+
+  beforeEach("register and signin", () => {
+    return supertest(app)
+      .post("/api/users")
+      .send(testUsers[0])
+      .then((res) => {
+        return supertest(app)
+          .post("/api/auth/login")
+          .send(testUsers[0])
+          .then((res2) => {
+            authToken = res2.body.authToken;
+          });
+      });
+  });
 
   afterEach("cleanup", () => helpers.cleanTables(db));
 
@@ -76,10 +92,11 @@ describe("Children Endpoints", function () {
 
         it(`responds with 404`, () => {
           const childId = 123456;
+
           return supertest(app)
             .get(`/api/children/${childId}`)
-            .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
-            .expect(404, { error: `Child doesn't exist` });
+            .set("Authorization", `Bearer ${authToken}`)
+            .expect(404, { error: `child doesn't exist` });
         });
       });
 
@@ -98,7 +115,7 @@ describe("Children Endpoints", function () {
 
           return supertest(app)
             .get(`/api/children/${childId}`)
-            .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+            .set("Authorization", `Bearer ${authToken}`)
             .expect(200, expectedChild);
         });
       });
@@ -135,8 +152,8 @@ describe("Children Endpoints", function () {
             const childId = 123456;
             return supertest(app)
               .get(`/api/children/${childId}/chores`)
-              .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
-              .expect(404, { error: `Child doesn't exist` });
+              .set("Authorization", `Bearer ${authToken}`)
+              .expect(404, { error: `child doesn't exist` });
           });
         });
 
@@ -146,7 +163,7 @@ describe("Children Endpoints", function () {
           );
 
           it("responds with 200 and the specified chores", () => {
-            const childId = 1;
+            const childId = 2;
             const expectedChores = helpers.makeExpectedChildChores(
               testUsers,
               childId,
@@ -155,10 +172,46 @@ describe("Children Endpoints", function () {
 
             return supertest(app)
               .get(`/api/children/${childId}/chores`)
-              .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+              .set("Authorization", `Bearer ${authToken}`)
               .expect(200, expectedChores);
           });
         });
+      });
+    });
+    describe(`POST /api/children`, () => {
+      beforeEach("insert children", () =>
+        helpers.seedChildrenTables(db, testUsers, testChildren)
+      );
+
+      it(`creates a child, responding with 201 and the new child`, function () {
+        this.retries(3);
+        const testUser = testUsers[0];
+        const newChild = {
+          user_id: testUser.user_id,
+          name: "first test child",
+        };
+        return supertest(app)
+          .post("/api/children")
+          .set("Authorization", `Bearer ${authToken}`)
+          .send(newChild)
+          .expect(201)
+          .expect((res) => {
+            expect(res.body).to.have.property("id");
+            expect(res.body.user_id).to.eql(testUser.id);
+            expect(res.body.name).to.eql(newChild.name);
+            expect(res.headers.location).to.eql(`/api/children/${res.body.id}`);
+          })
+          .expect((res) =>
+            db
+              .from("chorewars_children")
+              .select("*")
+              .where({ id: res.body.id })
+              .first()
+              .then((row) => {
+                expect(row.user_id).to.eql(testUser.id);
+                expect(row.name).to.eql(newChild.name);
+              })
+          );
       });
     });
   });

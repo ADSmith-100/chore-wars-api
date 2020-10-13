@@ -46,6 +46,11 @@ describe("Protected endpoints", function () {
       method: supertest(app).post,
     },
     {
+      name: "POST /api/children",
+      path: "/api/children",
+      method: supertest(app).post,
+    },
+    {
       name: "POST /api/auth/refresh",
       path: "/api/auth/refresh",
       method: supertest(app).post,

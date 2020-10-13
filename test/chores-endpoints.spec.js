@@ -31,9 +31,12 @@ describe("Chores Endpoints", function () {
       const testChild = testChildren[0];
       const testUser = testUsers[0];
       const newChore = {
-        title: "Test new chore",
+        user_id: testChild.user_id,
         child_id: testChild.id,
+        title: "Test new chore",
+        status: "FALSE",
       };
+      console.log(newChore);
       return supertest(app)
         .post("/api/chores")
         .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
@@ -43,14 +46,10 @@ describe("Chores Endpoints", function () {
           expect(res.body).to.have.property("id");
           expect(res.body.title).to.eql(newChore.title);
           expect(res.body.child_id).to.eql(newChore.child_id);
-          expect(res.body.user.id).to.eql(testUser.id);
+          expect(res.body.user_id).to.eql(newChore.user_id);
           expect(res.headers.location).to.eql(`/api/chores/${res.body.id}`);
-          const expectedDate = new Date().toLocaleString("en", {
-            timeZone: "UTC",
-          });
-          const actualDate = new Date(res.body.date_created).toLocaleString();
-          expect(actualDate).to.eql(expectedDate);
         })
+
         .expect((res) =>
           db
             .from("chorewars_chores")
@@ -61,16 +60,11 @@ describe("Chores Endpoints", function () {
               expect(row.title).to.eql(newChore.title);
               expect(row.child_id).to.eql(newChore.child_id);
               expect(row.user_id).to.eql(testUser.id);
-              const expectedDate = new Date().toLocaleString("en", {
-                timeZone: "UTC",
-              });
-              const actualDate = new Date(row.date_created).toLocaleString();
-              expect(actualDate).to.eql(expectedDate);
             })
         );
     });
 
-    const requiredFields = ["title", "child_id"];
+    const requiredFields = ["title", "user_id", "child_id"];
 
     requiredFields.forEach((field) => {
       const testChild = testChildren[0];
@@ -78,6 +72,7 @@ describe("Chores Endpoints", function () {
       const newChore = {
         title: "Test new chore",
         child_id: testChild.id,
+        user_id: testChild.user_id,
       };
 
       it(`responds with 400 and an error message when the '${field}' is missing`, () => {

@@ -7,6 +7,7 @@ const ChoresService = {
       .select(
         "chore.id",
         "chore.user_id",
+        "chore.child_id",
         "chore.title",
         "chore.status",
         db.raw(
@@ -16,7 +17,7 @@ const ChoresService = {
                 SELECT
                   usr.id,
                   usr.email,                  
-                  usr.date_created,
+                  usr.date_created
               ) tmp)
             )
           ) AS "user"`

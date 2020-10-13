@@ -4,25 +4,25 @@ const jwt = require("jsonwebtoken");
 function makeUsersArray() {
   return [
     {
-      id: 1,
+      id: 2,
       email: "test-user-1",
-      password: "password",
+      password: "P@ssword1234",
       date_created: new Date("2029-01-22T16:28:32.615Z"),
     },
     {
-      id: 2,
+      id: 3,
       email: "test-user-2",
       password: "password",
       date_created: new Date("2029-01-22T16:28:32.615Z"),
     },
     {
-      id: 3,
+      id: 4,
       email: "test-user-3",
       password: "password",
       date_created: new Date("2029-01-22T16:28:32.615Z"),
     },
     {
-      id: 4,
+      id: 5,
       email: "test-user-4",
       password: "password",
       date_created: new Date("2029-01-22T16:28:32.615Z"),
@@ -66,22 +66,22 @@ function makeChoresArray(users, child) {
 function makeChildArray(users) {
   return [
     {
-      id: 1,
+      id: 2,
       user_id: users[0].id,
       name: "First test child!",
     },
     {
-      id: 2,
+      id: 3,
       user_id: users[1].id,
       name: "Second test child!",
     },
     {
-      id: 3,
+      id: 4,
       user_id: users[2].id,
       name: "Third test child!",
     },
     {
-      id: 4,
+      id: 5,
       user_id: users[3].id,
       name: "Fourth test child!",
     },
@@ -112,6 +112,7 @@ function makeExpectedChildChores(users, childId, chores) {
 
   return expectedChores.map((chore) => {
     const choreChild = users.find((child) => child.id === chore.child_id);
+    console.log({ chore, choreChild });
     return {
       id: chore.id,
       user_id: chore.user_id,

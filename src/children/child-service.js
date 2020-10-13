@@ -24,7 +24,14 @@ const ChildService = {
       .leftJoin("chorewars_users AS usr", "chi.user_id", "usr.id")
       .groupBy("chi.id", "usr.id");
   },
-
+  insertChild(db, newChild) {
+    return db
+      .insert(newChild)
+      .into("chorewars_children")
+      .returning("*")
+      .then(([child]) => child)
+      .then((child) => ChildService.getById(db, child.id));
+  },
   getById(db, id) {
     return ChildService.getAllChildren(db).where("chi.id", id).first();
   },
