@@ -6,7 +6,7 @@ const helpers = require("./test-helpers");
 describe("Users Endpoints", function () {
   let db;
 
-  const { testUsers } = helpers.makeArticlesFixtures(); //need to change method names
+  const { testUsers } = helpers.makeChildrenFixtures(); //need to change method names
   const testUser = testUsers[0];
 
   before("make knex instance", () => {

@@ -6,13 +6,13 @@ const helpers = require("./test-helpers");
 describe("Auth Endpoints", function () {
   let db;
 
-  const { testUsers } = helpers.makeArticlesFixtures(); //must change method names
+  const { testUsers } = helpers.makeChildrenFixtures(); //must change method names - was originally articles
   const testUser = testUsers[0];
 
   before("make knex instance", () => {
     db = knex({
       client: "pg",
-      connection: process.env.TEST_DB_URL,
+      connection: process.env.TEST_DATABASE_URL,
     });
     app.set("db", db);
   });
@@ -26,11 +26,11 @@ describe("Auth Endpoints", function () {
   describe(`POST /api/auth/login`, () => {
     beforeEach("insert users", () => helpers.seedUsers(db, testUsers));
 
-    const requiredFields = ["user_name", "password"];
+    const requiredFields = ["email", "password"];
 
     requiredFields.forEach((field) => {
       const loginAttemptBody = {
-        user_name: testUser.user_name,
+        email: testUser.email,
         password: testUser.password,
       };
 
@@ -46,35 +46,35 @@ describe("Auth Endpoints", function () {
       });
     });
 
-    it(`responds 400 'invalid user_name or password' when bad user_name`, () => {
-      const userInvalidUser = { user_name: "user-not", password: "existy" };
+    it(`responds 400 'invalid email or password' when bad email`, () => {
+      const userInvalidUser = { email: "user-not", password: "existy" };
       return supertest(app)
         .post("/api/auth/login")
         .send(userInvalidUser)
-        .expect(400, { error: `Incorrect user_name or password` });
+        .expect(400, { error: `Incorrect email or password` });
     });
 
-    it(`responds 400 'invalid user_name or password' when bad password`, () => {
+    it(`responds 400 'invalid email or password' when bad password`, () => {
       const userInvalidPass = {
-        user_name: testUser.user_name,
+        email: testUser.email,
         password: "incorrect",
       };
       return supertest(app)
         .post("/api/auth/login")
         .send(userInvalidPass)
-        .expect(400, { error: `Incorrect user_name or password` });
+        .expect(400, { error: `Incorrect email or password` });
     });
 
     it(`responds 200 and JWT auth token using secret when valid credentials`, () => {
       const userValidCreds = {
-        user_name: testUser.user_name,
+        email: testUser.email,
         password: testUser.password,
       };
       const expectedToken = jwt.sign(
         { user_id: testUser.id },
         process.env.JWT_SECRET,
         {
-          subject: testUser.user_name,
+          subject: testUser.email,
           expiresIn: process.env.JWT_EXPIRY,
           algorithm: "HS256",
         }
@@ -96,7 +96,7 @@ describe("Auth Endpoints", function () {
         { user_id: testUser.id },
         process.env.JWT_SECRET,
         {
-          subject: testUser.user_name,
+          subject: testUser.email,
           expiresIn: process.env.JWT_EXPIRY,
           algorithm: "HS256",
         }
