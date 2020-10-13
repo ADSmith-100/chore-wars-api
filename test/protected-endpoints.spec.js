@@ -73,7 +73,7 @@ describe("Protected endpoints", function () {
       });
 
       it(`responds 401 'Unauthorized request' when invalid sub in payload`, () => {
-        const invalidUser = { user_name: "user-not-existy", id: 1 };
+        const invalidUser = { email: "email-not-existy", id: 1 };
         return endpoint
           .method(endpoint.path)
           .set("Authorization", helpers.makeAuthHeader(invalidUser))
