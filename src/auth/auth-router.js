@@ -32,7 +32,7 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
           });
 
         const sub = dbUser.email;
-        const payload = { user_id: dbUser.id };
+        const payload = { email: dbUser.email };
         res.send({
           authToken: AuthService.createJwt(sub, payload),
         });
@@ -43,7 +43,7 @@ authRouter.post("/login", jsonBodyParser, (req, res, next) => {
 
 authRouter.post("/refresh", requireAuth, (req, res) => {
   const sub = req.user.email;
-  const payload = { user_id: req.user.id };
+  const payload = { email: req.user.email };
   res.send({
     authToken: AuthService.createJwt(sub, payload),
   });

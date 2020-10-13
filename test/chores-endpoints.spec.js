@@ -5,7 +5,7 @@ const helpers = require("./test-helpers");
 describe("Chores Endpoints", function () {
   let db;
 
-  const { testChildren, testUsers } = helpers.makeChildrenFixtures(); //update methods
+  const { testChildren, testUsers } = helpers.makeChildrenFixtures();
 
   before("make knex instance", () => {
     db = knex({
