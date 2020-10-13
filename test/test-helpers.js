@@ -102,7 +102,7 @@ function makeExpectedChild(users, child, chores = []) {
     parent: {
       id: parent.id,
       email: parent.email,
-      date_created: author.date_created.toISOString(),
+      date_created: parent.date_created.toISOString(),
     },
   };
 }
@@ -111,7 +111,7 @@ function makeExpectedChildChores(users, childId, chores) {
   const expectedChores = chores.filter((chore) => chore.child_id === childId);
 
   return expectedChores.map((chore) => {
-    const choreChild = children.find((child) => child.id === chore.child_id);
+    const choreChild = users.find((child) => child.id === chore.child_id);
     return {
       id: chore.id,
       user_id: chore.user_id,
@@ -210,7 +210,7 @@ function seedChildrenTables(db, users, children, chores = []) {
     await trx.raw(`SELECT setval('chorewars_children_id_seq', ?)`, [
       children[children.length - 1].id,
     ]);
-    // only insert comments if there are some, also update the sequence counter
+    // only insert chores if there are some, also update the sequence counter
     if (chores.length) {
       await trx.into("chorewars_chores").insert(chores);
       await trx.raw(`SELECT setval('chorewars_chores_id_seq', ?)`, [

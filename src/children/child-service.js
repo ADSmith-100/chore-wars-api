@@ -60,7 +60,7 @@ const ChildService = {
       id: child.id,
       user_id: child.user_id,
       name: child.name,
-
+      number_of_chores: Number(child.number_of_chores) || 0,
       parent: {
         id: parent.id,
         email: parent.email,

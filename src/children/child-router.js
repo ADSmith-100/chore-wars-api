@@ -25,7 +25,7 @@ childRouter
   .all(requireAuth)
   .all(checkChildExists)
   .get((req, res, next) => {
-    ChildService.getChoresForChild(req.app.get("db"), req.params.child_id)
+    ChildService.getChildChores(req.app.get("db"), req.params.child_id)
       .then((chores) => {
         res.json(chores.map(ChildService.serializeChildChore));
       })

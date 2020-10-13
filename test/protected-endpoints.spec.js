@@ -7,14 +7,14 @@ describe("Protected endpoints", function () {
 
   const {
     testUsers,
-    testArticles,
-    testComments,
-  } = helpers.makeChildrenFixtures(); //update methods and such
+    testChildren,
+    testChores,
+  } = helpers.makeChildrenFixtures();
 
   before("make knex instance", () => {
     db = knex({
       client: "pg",
-      connection: process.env.TEST_DB_URL,
+      connection: process.env.TEST_DATABASE_URL,
     });
     app.set("db", db);
   });
@@ -25,24 +25,24 @@ describe("Protected endpoints", function () {
 
   afterEach("cleanup", () => helpers.cleanTables(db));
 
-  beforeEach("insert articles", () =>
-    helpers.seedArticlesTables(db, testUsers, testArticles, testComments)
+  beforeEach("insert children", () =>
+    helpers.seedChildrenTables(db, testUsers, testChildren, testChores)
   );
 
   const protectedEndpoints = [
     {
-      name: "GET /api/articles/:article_id",
-      path: "/api/articles/1",
+      name: "GET /api/children/:child_id",
+      path: "/api/children/1",
       method: supertest(app).get,
     },
     {
-      name: "GET /api/articles/:article_id/comments",
-      path: "/api/articles/1/comments",
+      name: "GET /api/children/:child_id/chores",
+      path: "/api/children/1/chores",
       method: supertest(app).get,
     },
     {
-      name: "POST /api/comments",
-      path: "/api/comments",
+      name: "POST /api/chores",
+      path: "/api/chores",
       method: supertest(app).post,
     },
     {
