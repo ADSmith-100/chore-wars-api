@@ -1,3 +1,4 @@
+const { expect } = require("chai");
 const knex = require("knex");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
@@ -34,9 +35,9 @@ describe("Chores Endpoints", function () {
         user_id: testChild.user_id,
         child_id: testChild.id,
         title: "Test new chore",
-        status: "FALSE",
+        status: false,
       };
-      console.log(newChore);
+
       return supertest(app)
         .post("/api/chores")
         .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
@@ -47,6 +48,7 @@ describe("Chores Endpoints", function () {
           expect(res.body.title).to.eql(newChore.title);
           expect(res.body.child_id).to.eql(newChore.child_id);
           expect(res.body.user_id).to.eql(newChore.user_id);
+          expect(res.body.status).to.eq(newChore.status);
           expect(res.headers.location).to.eql(`/api/chores/${res.body.id}`);
         })
 
@@ -60,11 +62,12 @@ describe("Chores Endpoints", function () {
               expect(row.title).to.eql(newChore.title);
               expect(row.child_id).to.eql(newChore.child_id);
               expect(row.user_id).to.eql(testUser.id);
+              expect(row.status).to.eql(newChore.status);
             })
         );
     });
 
-    const requiredFields = ["title", "user_id", "child_id"];
+    const requiredFields = ["title", "user_id", "child_id", "status"];
 
     requiredFields.forEach((field) => {
       const testChild = testChildren[0];
@@ -73,6 +76,7 @@ describe("Chores Endpoints", function () {
         title: "Test new chore",
         child_id: testChild.id,
         user_id: testChild.user_id,
+        status: false,
       };
 
       it(`responds with 400 and an error message when the '${field}' is missing`, () => {

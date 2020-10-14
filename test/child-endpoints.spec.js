@@ -5,7 +5,7 @@ const helpers = require("./test-helpers");
 
 describe("Children Endpoints", function () {
   let db;
-  let authToken;
+  // let authToken;this was tjs way of doing the auth to post stuff.  Not sure if this is the issue or not
 
   const {
     testUsers,
@@ -25,19 +25,19 @@ describe("Children Endpoints", function () {
 
   before("cleanup", () => helpers.cleanTables(db));
 
-  beforeEach("register and signin", () => {
-    return supertest(app)
-      .post("/api/users")
-      .send(testUsers[0])
-      .then((res) => {
-        return supertest(app)
-          .post("/api/auth/login")
-          .send(testUsers[0])
-          .then((res2) => {
-            authToken = res2.body.authToken;
-          });
-      });
-  });
+  // beforeEach("register and signin", () => {
+  //   return supertest(app)
+  //     .post("/api/users")
+  //     .send(testUsers[0])
+  //     .then((res) => {
+  //       return supertest(app)
+  //         .post("/api/auth/login")
+  //         .send(testUsers[0])
+  //         .then((res2) => {
+  //           authToken = res2.body.authToken;
+  //         });
+  //     });
+  // });
 
   afterEach("cleanup", () => helpers.cleanTables(db));
 
@@ -95,7 +95,7 @@ describe("Children Endpoints", function () {
 
           return supertest(app)
             .get(`/api/children/${childId}`)
-            .set("Authorization", `Bearer ${authToken}`)
+            .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
             .expect(404, { error: `child doesn't exist` });
         });
       });
@@ -109,13 +109,13 @@ describe("Children Endpoints", function () {
           const childId = 2;
           const expectedChild = helpers.makeExpectedChild(
             testUsers,
-            testChildren[childId - 1],
+            testChildren[childId - 2],
             testChores
           );
 
           return supertest(app)
             .get(`/api/children/${childId}`)
-            .set("Authorization", `Bearer ${authToken}`)
+            .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
             .expect(200, expectedChild);
         });
       });
@@ -152,7 +152,7 @@ describe("Children Endpoints", function () {
             const childId = 123456;
             return supertest(app)
               .get(`/api/children/${childId}/chores`)
-              .set("Authorization", `Bearer ${authToken}`)
+              .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
               .expect(404, { error: `child doesn't exist` });
           });
         });
@@ -165,14 +165,14 @@ describe("Children Endpoints", function () {
           it("responds with 200 and the specified chores", () => {
             const childId = 2;
             const expectedChores = helpers.makeExpectedChildChores(
-              testUsers,
+              testChildren,
               childId,
               testChores
             );
 
             return supertest(app)
               .get(`/api/children/${childId}/chores`)
-              .set("Authorization", `Bearer ${authToken}`)
+              .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
               .expect(200, expectedChores);
           });
         });
@@ -187,12 +187,12 @@ describe("Children Endpoints", function () {
         this.retries(3);
         const testUser = testUsers[0];
         const newChild = {
-          user_id: testUser.user_id,
-          name: "first test child",
+          user_id: testUser.id,
+          name: "test child",
         };
         return supertest(app)
           .post("/api/children")
-          .set("Authorization", `Bearer ${authToken}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .send(newChild)
           .expect(201)
           .expect((res) => {

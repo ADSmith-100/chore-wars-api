@@ -41,24 +41,26 @@ const ChildService = {
       .from("chorewars_chores AS chore")
       .select(
         "chore.id",
+        "chore.user_id",
         "chore.child_id",
         "chore.title",
+        "chore.status",
         db.raw(
           `json_strip_nulls(
             row_to_json(
               (SELECT tmp FROM (
                 SELECT
-                  usr.id,
-                  usr.email,                  
-                  usr.date_created,                  
+                  chi.id,
+                  chi.user_id,                  
+                  chi.name                  
               ) tmp)
             )
-          ) AS "user"`
+          ) AS "child"`
         )
       )
       .where("chore.child_id", child_id)
-      .leftJoin("chorewars_users AS usr", "chore.user_id", "usr.id")
-      .groupBy("chore.id", "usr.id");
+      .leftJoin("chorewars_children AS chi", "chore.child_id", "chi.id")
+      .groupBy("chore.id", "chi.id");
   },
 
   serializeChild(child) {
@@ -77,15 +79,17 @@ const ChildService = {
   },
 
   serializeChildChore(chore) {
-    const { user } = chore;
+    const { child } = chore;
     return {
       id: chore.id,
+      user_id: chore.user_id,
       child_id: chore.child_id,
       title: chore.title,
       status: chore.status,
-      user: {
-        id: user.id,
-        email: user.email,
+      child: {
+        id: child.id,
+        user_id: child.user_id,
+        name: child.name,
       },
     };
   },

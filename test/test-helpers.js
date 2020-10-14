@@ -37,28 +37,28 @@ function makeChoresArray(users, child) {
       user_id: users[0].id,
       child_id: child[0].id,
       title: "First test chore!",
-      status: "FALSE",
+      status: false,
     },
     {
       id: 2,
       user_id: users[1].id,
       child_id: child[1].id,
       title: "Second test chore!",
-      status: "FALSE",
+      status: false,
     },
     {
       id: 3,
       user_id: users[2].id,
       child_id: child[2].id,
       title: "Third test chore!",
-      status: "FALSE",
+      status: false,
     },
     {
       id: 4,
       user_id: users[3].id,
       child_id: child[3].id,
       title: "Fourth test chore!",
-      status: "FALSE",
+      status: false,
     },
   ];
 }
@@ -107,12 +107,12 @@ function makeExpectedChild(users, child, chores = []) {
   };
 }
 
-function makeExpectedChildChores(users, childId, chores) {
+function makeExpectedChildChores(children, childId, chores) {
   const expectedChores = chores.filter((chore) => chore.child_id === childId);
 
   return expectedChores.map((chore) => {
-    const choreChild = users.find((child) => child.id === chore.child_id);
-    console.log({ chore, choreChild });
+    const choreChild = children.find((child) => child.id === chore.child_id);
+
     return {
       id: chore.id,
       user_id: chore.user_id,

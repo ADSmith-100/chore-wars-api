@@ -1,5 +1,6 @@
 const express = require("express");
 const ChildService = require("./child-service");
+const path = require("path");
 const { requireAuth } = require("../middleware/jwt-auth");
 
 const childRouter = express.Router();
@@ -14,7 +15,7 @@ childRouter
       })
       .catch(next);
   })
-  .post(jsonBodyParser, (req, res, next) => {
+  .post(requireAuth, jsonBodyParser, (req, res, next) => {
     const { name, user_id } = req.body;
     const newChild = { name, user_id };
 
@@ -29,7 +30,7 @@ childRouter
         res
           .status(201)
           .location(path.posix.join(req.originalUrl, `/${child.id}`))
-          .json(serializeChild(child));
+          .json(ChildService.serializeChild(child));
       })
       .catch(next);
   });
