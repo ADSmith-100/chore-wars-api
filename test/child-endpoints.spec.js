@@ -63,29 +63,6 @@ describe("Children Endpoints", function () {
       });
     });
 
-    // context(`Given an XSS attack article`, () => {
-    //   const testUser = helpers.makeUsersArray()[1];
-    //   const {
-    //     maliciousArticle,
-    //     expectedArticle,
-    //   } = helpers.makeMaliciousArticle(testUser);
-
-    //   beforeEach("insert malicious article", () => {
-    //     return helpers.seedMaliciousArticle(db, testUser, maliciousArticle);
-    //   });
-
-    //   it("removes XSS attack content", () => {
-    //     return supertest(app)
-    //       .get(`/api/articles`)
-    //       .expect(200)
-    //       .expect((res) => {
-    //         expect(res.body[0].title).to.eql(expectedArticle.title);
-    //         expect(res.body[0].content).to.eql(expectedArticle.content);
-    //       });
-    // });
-    //   });
-    // });
-
     describe(`GET /api/children/:child_id`, () => {
       context(`Given no children`, () => {
         beforeEach(() => helpers.seedUsers(db, testUsers));
@@ -119,30 +96,6 @@ describe("Children Endpoints", function () {
             .expect(200, expectedChild);
         });
       });
-
-      // // context(`Given an XSS attack article`, () => {
-      // //   const testUser = helpers.makeUsersArray()[1];
-      // //   const {
-      // //     maliciousArticle,
-      // //     expectedArticle,
-      // //   } = helpers.makeMaliciousArticle(testUser);
-
-      // //   beforeEach("insert malicious article", () => {
-      // //     return helpers.seedMaliciousArticle(db, testUser, maliciousArticle);
-      // //   });
-
-      // //   it("removes XSS attack content", () => {
-      // //     return supertest(app)
-      // //       .get(`/api/articles/${maliciousArticle.id}`)
-      // //       .set("Authorization", helpers.makeAuthHeader(testUser))
-      // //       .expect(200)
-      // //       .expect((res) => {
-      // //         expect(res.body.title).to.eql(expectedArticle.title);
-      // //         expect(res.body.content).to.eql(expectedArticle.content);
-      // //       });
-      // //   });
-      // });
-      // });
 
       describe(`GET /api/children/:child_id/chores`, () => {
         context(`Given no children`, () => {

@@ -6,7 +6,11 @@ const helpers = require("./test-helpers");
 describe("Chores Endpoints", function () {
   let db;
 
-  const { testChildren, testUsers } = helpers.makeChildrenFixtures();
+  const {
+    testChildren,
+    testUsers,
+    testChores,
+  } = helpers.makeChildrenFixtures();
 
   before("make knex instance", () => {
     db = knex({
@@ -91,5 +95,61 @@ describe("Chores Endpoints", function () {
           });
       });
     });
+  });
+
+  describe(`PATCH /api/chores/:chore_id`, () => {
+    beforeEach("insert children", () =>
+      helpers.seedChildrenTables(db, testUsers, testChildren, testChores)
+    );
+
+    it(`updates a chore, responding with 204 and the updated chore`, function () {
+      this.retries(3);
+      const idToUpdate = 2;
+      const testChild = testChildren[0];
+      const testUser = testUsers[0];
+      const testChore = testChores[0];
+      const updatedChore = {
+        child_id: testChild.id + 1,
+
+        status: true,
+      };
+
+      const expectedChore = {
+        ...testChores[idToUpdate - 1],
+        ...updatedChore,
+      };
+
+      return supertest(app)
+        .patch(`/api/chores/${idToUpdate}`)
+        .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+        .send(updatedChore)
+        .expect(204)
+        .then((res) =>
+          supertest(app).get(`/api/chores/${idToUpdate}`).expect(expectedChore)
+        );
+    });
+
+    // // .expect((res) => {
+    // //   // expect(res.body).to.have.property("id");
+    // //   expect(res.body.title).to.eql(updatedChore.title);
+    // //   expect(res.body.child_id).to.eql(updatedChore.child_id);
+    // //   expect(res.body.user_id).to.eql(updatedChore.user_id);
+    // //   expect(res.body.status).to.eq(updatedChore.status);
+    // //   expect(res.headers.location).to.eql(`/api/chores/${res.body.id}`);
+    // // })
+
+    // // .expect((res) =>
+    // //   db
+    // //     .from("chorewars_chores")
+    // //     .select("*")
+    // //     .where({ id: res.body.id })
+    // //     .first()
+    // //     .then((row) => {
+    // //       expect(row.title).to.eql(updatedChore.title);
+    // //       expect(row.child_id).to.eql(updatedChore.child_id);
+    // //       expect(row.user_id).to.eql(updatedChore.id);
+    // //       expect(row.status).to.eql(updatedChore.status);
+    // //     })
+    // );
   });
 });

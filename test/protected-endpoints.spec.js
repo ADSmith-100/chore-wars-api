@@ -46,6 +46,11 @@ describe("Protected endpoints", function () {
       method: supertest(app).post,
     },
     {
+      name: "PATCH /api/chores/:chore_id",
+      path: "/api/chores/",
+      method: supertest(app).post,
+    },
+    {
       name: "POST /api/children",
       path: "/api/children",
       method: supertest(app).post,

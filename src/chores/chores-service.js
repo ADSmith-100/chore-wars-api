@@ -1,6 +1,30 @@
 const xss = require("xss");
 
 const ChoresService = {
+  // getAllChores(db) {
+  //   return db
+  //     .from("chorewars_chores AS chore")
+  //     .select(
+  //       "chi.id",
+  //       "chi.user_id",
+  //       "chi.name",
+
+  //       db.raw(`count(DISTINCT chore) AS number_of_chores`),
+  //       db.raw(
+  //         `json_strip_nulls(
+  //           json_build_object(
+  //             'id', usr.id,
+  //             'email', usr.email,
+  //             'date_created', usr.date_created
+  //           )
+  //         ) AS "parent"`
+  //       )
+  //     )
+  //     .leftJoin("chorewars_chores AS chore", "chi.id", "chore.child_id")
+  //     .leftJoin("chorewars_users AS usr", "chi.user_id", "usr.id")
+  //     .groupBy("chi.id", "usr.id");
+  // },
+
   getById(db, id) {
     return db
       .from("chorewars_chores AS chore")
@@ -35,6 +59,10 @@ const ChoresService = {
       .returning("*")
       .then(([chore]) => chore)
       .then((chore) => ChoresService.getById(db, chore.id));
+  },
+
+  updateChore(knex, id, newChoreFields) {
+    return knex("chorewars_chores").where({ id }).update(newChoreFields);
   },
 
   serializeChore(chore) {

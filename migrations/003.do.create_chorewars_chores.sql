@@ -3,7 +3,7 @@ CREATE TABLE chorewars_chores (
   user_id INTEGER   
     REFERENCES chorewars_users(id) ON DELETE CASCADE NOT NULL,
   child_id INTEGER   
-    REFERENCES chorewars_children(id) ON DELETE CASCADE NOT NULL,
+    REFERENCES chorewars_children(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   status BOOLEAN NOT NULL 
 );
