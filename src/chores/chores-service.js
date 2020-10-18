@@ -1,29 +1,31 @@
 const xss = require("xss");
 
 const ChoresService = {
-  // getAllChores(db) {
-  //   return db
-  //     .from("chorewars_chores AS chore")
-  //     .select(
-  //       "chi.id",
-  //       "chi.user_id",
-  //       "chi.name",
-
-  //       db.raw(`count(DISTINCT chore) AS number_of_chores`),
-  //       db.raw(
-  //         `json_strip_nulls(
-  //           json_build_object(
-  //             'id', usr.id,
-  //             'email', usr.email,
-  //             'date_created', usr.date_created
-  //           )
-  //         ) AS "parent"`
+  getAllChores(knex) {
+    return knex.select("*").from("chorewars_chores");
+  },
+  // .from("chorewars_chores AS chore")
+  // .select
+  //   // "chore.id",
+  //   // "chore.user_id",
+  //   // "chore.child_id",
+  //   // "chore.title",
+  //   // "chore.status"
+  // );
+  // db.raw(`count(DISTINCT chore) AS number_of_chores`),
+  //   db.raw(
+  //     `json_strip_nulls(
+  //       json_build_object(
+  //         'id', usr.id,
+  //         'email', usr.email,
+  //         'date_created', usr.date_created
   //       )
-  //     )
-  //     .leftJoin("chorewars_chores AS chore", "chi.id", "chore.child_id")
-  //     .leftJoin("chorewars_users AS usr", "chi.user_id", "usr.id")
-  //     .groupBy("chi.id", "usr.id");
-  // },
+  //     ) AS "parent"`
+  //   )
+  // )
+  // .leftJoin("chorewars_chores AS chore", "chore.id", "chore.child_id")
+  // .leftJoin("chorewars_users AS usr", "chore.user_id", "usr.id")
+  // .groupBy("chore.id", "usr.id");
 
   getById(db, id) {
     return db
@@ -73,11 +75,11 @@ const ChoresService = {
       child_id: chore.child_id,
       title: chore.title,
       status: chore.status,
-      user: {
-        id: user.id,
-        email: user.email,
-        date_created: new Date(user.date_created),
-      },
+      // user: {
+      //   id: user.id,
+      //   email: user.email,
+      //   date_created: new Date(user.date_created),
+      // },
     };
   },
 };

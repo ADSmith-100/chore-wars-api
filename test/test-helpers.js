@@ -88,6 +88,25 @@ function makeChildArray(users) {
   ];
 }
 
+function makeExpectedChores(children, userId, chores) {
+  // const expectedChores = chores.filter((chore) => chore.user_id === userId);
+
+  return chores.map((chore) => {
+    return {
+      id: chore.id,
+      user_id: chore.user_id,
+      child_id: chore.child_id,
+      title: chore.title,
+      status: chore.status,
+      // parent: {
+      //   id: parent.id,
+      //   email: parent.email,
+      //   date_created: parent.date_created.toISOString(),
+      // },
+    };
+  });
+}
+
 function makeExpectedChild(users, child, chores = []) {
   const parent = users.find((user) => user.id === child.user_id);
 
@@ -238,6 +257,7 @@ function makeAuthHeader(testUser, secret = process.env.JWT_SECRET) {
 module.exports = {
   makeUsersArray,
   makeChildArray,
+  makeExpectedChores,
   makeExpectedChild,
   makeExpectedChildChores,
   //   makeMaliciousArticle,

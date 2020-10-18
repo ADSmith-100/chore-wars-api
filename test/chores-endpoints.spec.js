@@ -26,130 +26,150 @@ describe("Chores Endpoints", function () {
 
   afterEach("cleanup", () => helpers.cleanTables(db));
 
-  describe(`POST /api/chores`, () => {
-    beforeEach("insert children", () =>
-      helpers.seedChildrenTables(db, testUsers, testChildren)
-    );
-
-    it(`creates a chore, responding with 201 and the new chore`, function () {
-      this.retries(3);
-      const testChild = testChildren[0];
-      const testUser = testUsers[0];
-      const newChore = {
-        user_id: testChild.user_id,
-        child_id: testChild.id,
-        title: "Test new chore",
-        status: false,
-      };
-
-      return supertest(app)
-        .post("/api/chores")
-        .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
-        .send(newChore)
-        .expect(201)
-        .expect((res) => {
-          expect(res.body).to.have.property("id");
-          expect(res.body.title).to.eql(newChore.title);
-          expect(res.body.child_id).to.eql(newChore.child_id);
-          expect(res.body.user_id).to.eql(newChore.user_id);
-          expect(res.body.status).to.eq(newChore.status);
-          expect(res.headers.location).to.eql(`/api/chores/${res.body.id}`);
-        })
-
-        .expect((res) =>
-          db
-            .from("chorewars_chores")
-            .select("*")
-            .where({ id: res.body.id })
-            .first()
-            .then((row) => {
-              expect(row.title).to.eql(newChore.title);
-              expect(row.child_id).to.eql(newChore.child_id);
-              expect(row.user_id).to.eql(testUser.id);
-              expect(row.status).to.eql(newChore.status);
-            })
-        );
+  describe(`GET /api/chores`, () => {
+    context(`Given no chores`, () => {
+      it(`responds with 200 and an empty list`, () => {
+        return supertest(app).get("/api/chores").expect(200, []);
+      });
     });
 
-    const requiredFields = ["title", "user_id", "child_id", "status"];
+    context("Given there are chores in the database", () => {
+      beforeEach("insert children", () =>
+        helpers.seedChildrenTables(db, testUsers, testChildren, testChores)
+      );
 
-    requiredFields.forEach((field) => {
-      const testChild = testChildren[0];
-      const testUser = testUsers[0];
-      const newChore = {
-        title: "Test new chore",
-        child_id: testChild.id,
-        user_id: testChild.user_id,
-        status: false,
-      };
+      it("responds with 200 and all of the chores", () => {
+        return supertest(app).get("/api/chores").expect(200, testChores);
+      });
+    });
 
-      it(`responds with 400 and an error message when the '${field}' is missing`, () => {
-        delete newChore[field];
+    describe(`POST /api/chores`, () => {
+      beforeEach("insert children", () =>
+        helpers.seedChildrenTables(db, testUsers, testChildren)
+      );
+
+      it(`creates a chore, responding with 201 and the new chore`, function () {
+        this.retries(3);
+        const testChild = testChildren[0];
+        const testUser = testUsers[0];
+        const newChore = {
+          user_id: testChild.user_id,
+          child_id: testChild.id,
+          title: "Test new chore",
+          status: false,
+        };
 
         return supertest(app)
           .post("/api/chores")
-          .set("Authorization", helpers.makeAuthHeader(testUser))
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
           .send(newChore)
-          .expect(400, {
-            error: `Missing '${field}' in request body`,
-          });
+          .expect(201)
+          .expect((res) => {
+            expect(res.body).to.have.property("id");
+            expect(res.body.title).to.eql(newChore.title);
+            expect(res.body.child_id).to.eql(newChore.child_id);
+            expect(res.body.user_id).to.eql(newChore.user_id);
+            expect(res.body.status).to.eq(newChore.status);
+            expect(res.headers.location).to.eql(`/api/chores/${res.body.id}`);
+          })
+
+          .expect((res) =>
+            db
+              .from("chorewars_chores")
+              .select("*")
+              .where({ id: res.body.id })
+              .first()
+              .then((row) => {
+                expect(row.title).to.eql(newChore.title);
+                expect(row.child_id).to.eql(newChore.child_id);
+                expect(row.user_id).to.eql(testUser.id);
+                expect(row.status).to.eql(newChore.status);
+              })
+          );
+      });
+
+      const requiredFields = ["title", "user_id", "child_id", "status"];
+
+      requiredFields.forEach((field) => {
+        const testChild = testChildren[0];
+        const testUser = testUsers[0];
+        const newChore = {
+          title: "Test new chore",
+          child_id: testChild.id,
+          user_id: testChild.user_id,
+          status: false,
+        };
+
+        it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+          delete newChore[field];
+
+          return supertest(app)
+            .post("/api/chores")
+            .set("Authorization", helpers.makeAuthHeader(testUser))
+            .send(newChore)
+            .expect(400, {
+              error: `Missing '${field}' in request body`,
+            });
+        });
       });
     });
-  });
 
-  describe(`PATCH /api/chores/:chore_id`, () => {
-    beforeEach("insert children", () =>
-      helpers.seedChildrenTables(db, testUsers, testChildren, testChores)
-    );
+    describe(`PATCH /api/chores/:chore_id`, () => {
+      beforeEach("insert children", () =>
+        helpers.seedChildrenTables(db, testUsers, testChildren, testChores)
+      );
 
-    it(`updates a chore, responding with 204 and the updated chore`, function () {
-      this.retries(3);
-      const idToUpdate = 2;
-      const testChild = testChildren[0];
-      const testUser = testUsers[0];
-      const testChore = testChores[0];
-      const updatedChore = {
-        child_id: testChild.id + 1,
+      it(`updates a chore, responding with 204 and the updated chore`, function () {
+        this.retries(3);
+        const idToUpdate = 2;
+        const testChild = testChildren[0];
+        const testUser = testUsers[0];
+        const testChore = testChores[0];
+        const updatedChore = {
+          child_id: testChild.id + 1,
 
-        status: true,
-      };
+          status: true,
+        };
 
-      const expectedChore = {
-        ...testChores[idToUpdate - 1],
-        ...updatedChore,
-      };
+        const expectedChore = {
+          ...testChores[idToUpdate - 1],
+          ...updatedChore,
+        };
 
-      return supertest(app)
-        .patch(`/api/chores/${idToUpdate}`)
-        .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
-        .send(updatedChore)
-        .expect(204)
-        .then((res) =>
-          supertest(app).get(`/api/chores/${idToUpdate}`).expect(expectedChore)
-        );
+        return supertest(app)
+          .patch(`/api/chores/${idToUpdate}`)
+          .set("Authorization", helpers.makeAuthHeader(testUsers[0]))
+          .send(updatedChore)
+          .expect(204)
+          .then((res) =>
+            supertest(app)
+              .get(`/api/chores/${idToUpdate}`)
+              .expect(expectedChore)
+          );
+      });
+
+      // // .expect((res) => {
+      // //   // expect(res.body).to.have.property("id");
+      // //   expect(res.body.title).to.eql(updatedChore.title);
+      // //   expect(res.body.child_id).to.eql(updatedChore.child_id);
+      // //   expect(res.body.user_id).to.eql(updatedChore.user_id);
+      // //   expect(res.body.status).to.eq(updatedChore.status);
+      // //   expect(res.headers.location).to.eql(`/api/chores/${res.body.id}`);
+      // // })
+
+      // // .expect((res) =>
+      // //   db
+      // //     .from("chorewars_chores")
+      // //     .select("*")
+      // //     .where({ id: res.body.id })
+      // //     .first()
+      // //     .then((row) => {
+      // //       expect(row.title).to.eql(updatedChore.title);
+      // //       expect(row.child_id).to.eql(updatedChore.child_id);
+      // //       expect(row.user_id).to.eql(updatedChore.id);
+      // //       expect(row.status).to.eql(updatedChore.status);
+      // //     })
+      // );
     });
-
-    // // .expect((res) => {
-    // //   // expect(res.body).to.have.property("id");
-    // //   expect(res.body.title).to.eql(updatedChore.title);
-    // //   expect(res.body.child_id).to.eql(updatedChore.child_id);
-    // //   expect(res.body.user_id).to.eql(updatedChore.user_id);
-    // //   expect(res.body.status).to.eq(updatedChore.status);
-    // //   expect(res.headers.location).to.eql(`/api/chores/${res.body.id}`);
-    // // })
-
-    // // .expect((res) =>
-    // //   db
-    // //     .from("chorewars_chores")
-    // //     .select("*")
-    // //     .where({ id: res.body.id })
-    // //     .first()
-    // //     .then((row) => {
-    // //       expect(row.title).to.eql(updatedChore.title);
-    // //       expect(row.child_id).to.eql(updatedChore.child_id);
-    // //       expect(row.user_id).to.eql(updatedChore.id);
-    // //       expect(row.status).to.eql(updatedChore.status);
-    // //     })
-    // );
   });
 });

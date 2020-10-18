@@ -8,13 +8,14 @@ const jsonBodyParser = express.json();
 
 choresRouter
   .route("/")
-  // .get((req, res, next) => {
-  //   ChoresService.getAllChores(req.app.get("db"))
-  //     .then((chores) => {
-  //       res.json(chores.map(ChoreService.serializeChore));
-  //     })
-  //     .catch(next);
-  // })
+  .get((req, res, next) => {
+    const knexInstance = req.app.get("db");
+    ChoresService.getAllChores(knexInstance)
+      .then((chore) => {
+        res.json(chore.map(ChoresService.serializeChore));
+      })
+      .catch(next);
+  })
 
   .post(requireAuth, jsonBodyParser, (req, res, next) => {
     const { user_id, child_id, title, status } = req.body;
