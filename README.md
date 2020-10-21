@@ -1,3 +1,8 @@
+To seed dev db with demo data: sudo -u postgres psql -d chorewars -f ./seeds/seed.chorewars_tables.sql
+
+To seed prod db with demo data: heroku pg:psql then copy paste seed.chorewars_tables.sql into it
+There's also another way to do it with I think cat command? Need to find that again.
+
 # Express Boilerplate!
 
 This is a boilerplate project used for starting new projects!
