@@ -18,8 +18,8 @@ choresRouter
   })
 
   .post(requireAuth, jsonBodyParser, (req, res, next) => {
-    const { user_id, child_id, title, status } = req.body;
-    const newChore = { user_id, child_id, title, status };
+    const { child_id, title, status } = req.body;
+    const newChore = { child_id, title, status };
 
     for (const [key, value] of Object.entries(newChore))
       if (value == null)
@@ -35,6 +35,26 @@ choresRouter
           .status(201)
           .location(path.posix.join(req.originalUrl, `/${chore.id}`))
           .json(ChoresService.serializeChore(chore));
+      })
+      .catch(next);
+  })
+  .put(requireAuth, jsonBodyParser, (req, res, next) => {
+    const chores = req.body;
+
+    const newChores = chores;
+
+    // if (value == null)
+    //   return res.status(400).json({
+    //     error: `Missing request body`,
+    //   });
+
+    // newChores.user_id = req.user.id;
+    // newChores.title = req.title;
+
+    ChoresService.updateAllChores(req.app.get("db"), req.params, newChores)
+      .then((chores) => {
+        res.status(201).json(chores);
+        console.log(newChores);
       })
       .catch(next);
   });
@@ -81,7 +101,7 @@ choresRouter
       choreToUpdate
     )
       .then((numRowsAffected) => {
-        res.status(204).end();
+        res.status(201).end();
       })
       .catch(next);
   });

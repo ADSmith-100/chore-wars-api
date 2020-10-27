@@ -88,6 +88,19 @@ function makeChildArray(users) {
   ];
 }
 
+function makeUpdatedChores(chores) {
+  console.log(chores);
+  return chores.map((chore) => {
+    return {
+      id: chore.id,
+      user_id: chore.user_id,
+      child_id: null,
+      title: chore.title,
+      status: false,
+    };
+  });
+}
+
 function makeExpectedChores(children, userId, chores) {
   // const expectedChores = chores.filter((chore) => chore.user_id === userId);
 
@@ -255,6 +268,7 @@ function makeAuthHeader(testUser, secret = process.env.JWT_SECRET) {
 }
 
 module.exports = {
+  makeUpdatedChores,
   makeUsersArray,
   makeChildArray,
   makeExpectedChores,

@@ -64,8 +64,32 @@ const ChoresService = {
   },
 
   updateChore(knex, id, newChoreFields) {
+    console.log(newChoreFields);
+    console.log(id);
     return knex("chorewars_chores").where({ id }).update(newChoreFields);
   },
+
+  updateAllChores(db) {
+    return db
+      .into("chorewars_chores")
+      .update({ child_id: null, status: false })
+      .returning("*");
+  },
+  // updateAllChores(db, id, updatedChores) {
+  //   console.log(updatedChores);
+  //   console.log(id);
+
+  //   return db
+  //     .update(updatedChores)
+  //     .into("chorewars_chores")
+  //     .where("chorewars_chores")
+  //     .returning("*");
+  // },
+
+  // updateAllChores(knex, chores, updatedChores) {
+  //   console.log(updatedChores);
+  //   return knex("chorewars_chores").update(updatedChores);
+  // },
 
   serializeChore(chore) {
     const { user } = chore;

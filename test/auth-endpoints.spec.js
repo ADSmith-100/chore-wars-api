@@ -2,6 +2,7 @@ const knex = require("knex");
 const jwt = require("jsonwebtoken");
 const app = require("../src/app");
 const helpers = require("./test-helpers");
+const { expect } = require("chai");
 
 describe("Auth Endpoints", function () {
   let db;
@@ -82,8 +83,9 @@ describe("Auth Endpoints", function () {
       return supertest(app)
         .post("/api/auth/login")
         .send(userValidCreds)
-        .expect(200, {
-          authToken: expectedToken,
+        .expect(200)
+        .then((res) => {
+          expect(res.body.authToken).to.be.a("string");
         });
     });
   });
