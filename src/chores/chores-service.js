@@ -75,6 +75,29 @@ const ChoresService = {
       .update({ child_id: null, status: false })
       .returning("*");
   },
+
+  updateMultipleChores(db, updates) {
+    // [{id:9,child_id:5},{id:10,child_id:6}]
+    return updates.map((u) => {
+      return db
+        .into("chorewars_chores")
+        .update("child_id", u.child_id)
+        .where("id", u.id)
+        .returning("*")
+        .then((rows) => rows[0]);
+    });
+  },
+
+  //so this would work for unassign everything but not shuffle!
+
+  /**
+   * UPDATE chorewars_chores
+   *  SET child_id=9
+   *  WHERE id IN [5,10,500,16]
+   *
+   *  db.into('chorewars_chores').update([{}])
+   */
+
   // updateAllChores(db, id, updatedChores) {
   //   console.log(updatedChores);
   //   console.log(id);
