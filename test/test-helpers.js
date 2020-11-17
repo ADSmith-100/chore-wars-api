@@ -88,8 +88,20 @@ function makeChildArray(users) {
   ];
 }
 
-function makeUpdatedChores(chores) {
-  console.log(chores);
+function makeUpdatedChores(chores, children) {
+  let randomIds = children.map((a) => a.id);
+  return chores.map((chore) => {
+    return {
+      id: chore.id,
+      user_id: chore.user_id,
+      child_id: randomIds[Math.floor(Math.random() * randomIds.length)],
+      title: chore.title,
+      status: false,
+    };
+  });
+}
+
+function makeNullChildChores(chores) {
   return chores.map((chore) => {
     return {
       id: chore.id,
@@ -276,7 +288,7 @@ module.exports = {
   makeExpectedChildChores,
   //   makeMaliciousArticle,
   makeChoresArray,
-
+  makeNullChildChores,
   makeChildrenFixtures,
   cleanTables,
   seedChildrenTables,

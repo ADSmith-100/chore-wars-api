@@ -119,12 +119,12 @@ describe("Chores Endpoints", function () {
       helpers.seedChildrenTables(db, testUsers, testChildren, testChores)
     );
 
-    it(`updates all chores, responding with 201 and all chores`, function () {
+    it(`nulls all chore children, responding with 201 and all chores`, function () {
       this.retries(3);
       const testChild = testChildren[0];
       const testUser = testUsers[0];
       const testChore = testChores;
-      const updatedChores = helpers.makeUpdatedChores(testChores);
+      const updatedChores = helpers.makeNullChildChores(testChores);
 
       const expectedChores = updatedChores;
 
@@ -132,6 +132,34 @@ describe("Chores Endpoints", function () {
         .put(`/api/chores`)
         .set("Authorization", helpers.makeAuthHeader(testUser))
         .send(updatedChores)
+        .expect(201)
+        .then(
+          (res) => supertest(app).get(`/api/chores`).expect(expectedChores),
+          console.log(expectedChores)
+        );
+    });
+  });
+  describe.only(`PATCH /api/chores`, () => {
+    beforeEach("insert children", () =>
+      helpers.seedChildrenTables(db, testUsers, testChildren, testChores)
+    );
+
+    it(`updates all chores, responding with 201 and all chores`, function () {
+      this.retries(3);
+      const testChild = testChildren[0];
+      const testUser = testUsers[0];
+      const testChore = testChores;
+      const updatedAllChores = helpers.makeUpdatedChores(
+        testChores,
+        testChildren
+      );
+
+      const expectedChores = updatedAllChores;
+
+      return supertest(app)
+        .patch(`/api/chores`)
+        .set("Authorization", helpers.makeAuthHeader(testUser))
+        .send(updatedAllChores)
         .expect(201)
         .then(
           (res) => supertest(app).get(`/api/chores`).expect(expectedChores),

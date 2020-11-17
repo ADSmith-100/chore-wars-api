@@ -77,6 +77,7 @@ const ChoresService = {
   },
 
   updateMultipleChores(db, updates) {
+    console.log("updates", updates);
     // [{id:9,child_id:5},{id:10,child_id:6}]
     return updates.map((u) => {
       return db

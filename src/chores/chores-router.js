@@ -43,21 +43,45 @@ choresRouter
 
     const newChores = chores;
 
-    // if (value == null)
-    //   return res.status(400).json({
-    //     error: `Missing request body`,
-    //   });
-
-    // newChores.user_id = req.user.id;
-    // newChores.title = req.title;
-
     ChoresService.updateAllChores(req.app.get("db"), req.params, newChores)
       .then((chores) => {
         res.status(201).json(chores);
-        console.log(newChores);
+      })
+      .catch(next);
+  })
+  .patch(jsonBodyParser, (req, res, next) => {
+    const { child_id } = [req.body];
+    const updates = { child_id };
+    // const numberOfValues = Object.values(choreToUpdate).filter(Boolean).length;
+    // if (numberOfValues === 0) {
+    //   return res.status(400).json({
+    //     error: {
+    //       message: `Request body must contain either 'child_id', or 'status'`,
+    //     },
+    //   });
+    // }
+    ChoresService.updateMultipleChores(
+      req.app.get("db"),
+      req.params.chore_id,
+      updates
+    )
+      .then((numRowsAffected) => {
+        res.status(201).end();
       })
       .catch(next);
   });
+// .put(requireAuth, jsonBodyParser, (req, res, next) => {
+//   const chores = req.body;
+
+//   const newChores = chores;
+
+//   ChoresService.updateAllChores(req.app.get("db"), req.params, newChores)
+//     .then((chores) => {
+//       res.status(201).json(chores);
+//       console.log(newChores);
+//     })
+//     .catch(next);
+// });
 
 choresRouter
   .route("/:chore_id")
